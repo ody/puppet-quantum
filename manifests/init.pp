@@ -60,7 +60,7 @@
 # [*control_exchange*]
 #   (optional) What RPC queue/exchange to use
 #   Defaults to quantum
-
+#
 # [*rpc_backend*]
 #   (optional) what rpc/queuing service to use
 #   Defaults to impl_kombu (rabbitmq)
@@ -92,7 +92,7 @@
 #
 class quantum (
   $enabled                     = true,
-  $package_ensure              = 'present',
+  $package_ensure              = present,
   $verbose                     = 'False',
   $debug                       = 'False',
   $bind_host                   = '0.0.0.0',
@@ -139,16 +139,13 @@ class quantum (
     mode    => '0640',
   }
 
-  file { '/etc/quantum':
-    ensure  => directory,
-    mode    => '0750',
-  }
+  file { '/etc/quantum': ensure  => directory }
 
   file { '/etc/quantum/quantum.conf': }
 
   package { 'quantum':
     name   => $::quantum::params::package_name,
-    ensure => $package_ensure
+    ensure => $package_ensure,
   }
 
   quantum_config {
@@ -168,48 +165,9 @@ class quantum (
     'DEFAULT/rpc_backend':            value => $rpc_backend;
   }
 
-  if $rpc_backend == 'quantum.openstack.common.rpc.impl_kombu' {
-    if ! $rabbit_password {
-      fail("When rpc_backend is rabbitmq, you must set rabbit password")
-    }
-    if $rabbit_hosts {
-      quantum_config { 'DEFAULT/rabbit_host':  ensure => absent }
-      quantum_config { 'DEFAULT/rabbit_port':  ensure => absent }
-      quantum_config { 'DEFAULT/rabbit_hosts': value => join($rabbit_hosts, ',') }
-    } else {
-      quantum_config { 'DEFAULT/rabbit_host':  value => $rabbit_host }
-      quantum_config { 'DEFAULT/rabbit_port':  value => $rabbit_port }
-      quantum_config { 'DEFAULT/rabbit_hosts': value => "${rabbit_host}:${rabbit_port}" }
-    }
-
-    if size($rabbit_hosts) > 1 {
-      quantum_config { 'DEFAULT/rabbit_ha_queues': value => 'true' }
-    } else {
-      quantum_config { 'DEFAULT/rabbit_ha_queues': value => 'false' }
-    }
-    quantum_config {
-      'DEFAULT/rabbit_userid':       value => $rabbit_user;
-      'DEFAULT/rabbit_password':     value => $rabbit_password;
-      'DEFAULT/rabbit_virtual_host': value => $rabbit_virtual_host;
-    }
-  }
-
-  if $rpc_backend == 'quantum.openstack.common.rpc.impl_qpid' {
-    quantum_config {
-      'DEFAULT/qpid_hostname':               value => $qpid_hostname;
-      'DEFAULT/qpid_port':                   value => $qpid_port;
-      'DEFAULT/qpid_username':               value => $qpid_username;
-      'DEFAULT/qpid_password':               value => $qpid_password;
-      'DEFAULT/qpid_heartbeat':              value => $qpid_heartbeat;
-      'DEFAULT/qpid_protocol':               value => $qpid_protocol;
-      'DEFAULT/qpid_tcp_nodelay':            value => $qpid_tcp_nodelay;
-      'DEFAULT/qpid_reconnect':              value => $qpid_reconnect;
-      'DEFAULT/qpid_reconnect_timeout':      value => $qpid_reconnect_timeout;
-      'DEFAULT/qpid_reconnect_limit':        value => $qpid_reconnect_limit;
-      'DEFAULT/qpid_reconnect_interval_min': value => $qpid_reconnect_interval_min;
-      'DEFAULT/qpid_reconnect_interval_max': value => $qpid_reconnect_interval_max;
-      'DEFAULT/qpid_reconnect_interval':     value => $qpid_reconnect_interval;
-    }
+  case $rpc_backend {
+    'quantum.openstack.common.rpc.impl_kombu': { include quantum::rpc::rabbit }
+    'quantum.openstack.common.rpc.impl_qpid':  { include quantum::rpc::qpid   }
   }
 
   # Any machine using Quantum / OVS endpoints with certain nova networking configs will
@@ -225,5 +183,4 @@ class quantum (
   @exec { '/etc/init.d/libvirt-bin restart':
     refreshonly => true,
   }
-
 }
