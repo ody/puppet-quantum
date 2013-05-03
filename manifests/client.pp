@@ -8,15 +8,12 @@
 #   (optional) The state of the package
 #   Defaults to present
 #
-class quantum::client (
-  $package_ensure = present
-) {
+class quantum::client ($package_ensure = present) {
 
   include quantum::params
 
   package { 'python-quantumclient':
     name   => $::quantum::params::client_package_name,
-    ensure => $package_ensure
+    ensure => $package_ensure,
   }
-
 }
