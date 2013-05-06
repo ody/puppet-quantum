@@ -1,17 +1,18 @@
 class quantum::server (
   $auth_password,
-  $package_ensure   = 'present',
-  $enabled          = true,
-  $log_file         = '/var/log/quantum/server.log',
-  $auth_type        = 'keystone',
-  $auth_host        = 'localhost',
-  $auth_port        = '35357',
-  $auth_tenant      = 'services',
-  $auth_user        = 'quantum'
+  $package_ensure = present,
+  $enabled        = true,
+  $log_file       = '/var/log/quantum/server.log',
+  $auth_type      = 'keystone',
+  $auth_host      = 'localhost',
+  $auth_port      = '35357',
+  $auth_tenant    = 'services',
+  $auth_user      = 'quantum'
 ) {
-  include 'quantum::params'
 
-  require 'keystone::python'
+  include quantum::params
+
+  Class['keystone::python'] -> Class['quantum::server']
 
   Quantum_config<||> ~> Service['quantum-server']
   Quantum_api_config<||> ~> Service['quantum-server']
@@ -39,15 +40,15 @@ class quantum::server (
     Package['quantum-server'] -> Quantum_config<||>
     package {'quantum-server':
       name   => $::quantum::params::server_package,
-      ensure => $package_ensure
+      ensure => $package_ensure,
     }
   }
 
-  service {'quantum-server':
+  service { 'quantum-server':
     name       => $::quantum::params::server_service,
     ensure     => $service_ensure,
     enable     => $enabled,
     hasstatus  => true,
-    hasrestart => true
+    hasrestart => true,
   }
 }
