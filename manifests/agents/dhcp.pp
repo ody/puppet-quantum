@@ -13,7 +13,7 @@
 # [use_namespaces] Whether namespaces should be used with dhcp.
 # [root_helper] command used to run commands with sudo.
 class quantum::agents::dhcp (
-  $package_ensure   = 'present',
+  $package_ensure   = present,
   $enabled          = true,
   $debug            = 'False',
   $state_path       = '/var/lib/quantum',
@@ -24,7 +24,7 @@ class quantum::agents::dhcp (
   $root_helper      = 'sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf'
 ) {
 
-  include 'quantum::params'
+  include quantum::params
 
   case $dhcp_driver {
     /\.Dnsmasq/: {
@@ -48,13 +48,13 @@ class quantum::agents::dhcp (
   # This only lists config specific to the agent.  quantum.ini supplies
   # the rest.
   quantum_dhcp_agent_config {
-    'DEFAULT/debug':              value => $debug;
-    'DEFAULT/state_path':         value => $state_path;
-    'DEFAULT/resync_interval':    value => $resync_interval;
-    'DEFAULT/interface_driver':   value => $interface_driver;
-    'DEFAULT/dhcp_driver':        value => $dhcp_driver;
-    'DEFAULT/use_namespaces':     value => $use_namespaces;
-    'DEFAULT/root_helper':        value => $root_helper;
+    'DEFAULT/debug':            value => $debug;
+    'DEFAULT/state_path':       value => $state_path;
+    'DEFAULT/resync_interval':  value => $resync_interval;
+    'DEFAULT/interface_driver': value => $interface_driver;
+    'DEFAULT/dhcp_driver':      value => $dhcp_driver;
+    'DEFAULT/use_namespaces':   value => $use_namespaces;
+    'DEFAULT/root_helper':      value => $root_helper;
   }
 
   if $::quantum::params::dhcp_agent_package {
@@ -63,8 +63,8 @@ class quantum::agents::dhcp (
     Package['quantum-dhcp-agent'] -> Quantum_config<||>
     Package['quantum-dhcp-agent'] -> Service['quantum-dhcp-service']
     package { 'quantum-dhcp-agent':
-      name    => $::quantum::params::dhcp_agent_package,
-      ensure  => $package_ensure,
+      name   => $::quantum::params::dhcp_agent_package,
+      ensure => $package_ensure,
     }
   }
 

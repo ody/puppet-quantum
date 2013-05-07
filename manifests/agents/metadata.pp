@@ -1,7 +1,7 @@
 class quantum::agents::metadata (
   $auth_password,
   $shared_secret,
-  $package_ensure               = 'present',
+  $package_ensure               = present,
   $enabled                      = true,
   $debug                        = 'False',
   $auth_tenant                  = 'services',
@@ -9,25 +9,25 @@ class quantum::agents::metadata (
   $auth_url                     = 'http://localhost:35357/v2.0',
   $auth_region                  = 'RegionOne',
   $metadata_ip                  = '127.0.0.1',
-  $metadata_port                = '8775',
+  $metadata_port                = '8775'
   ) {
 
-  include 'quantum::params'
+  include quantum::params
 
   Package['quantum'] -> Quantum_metadata_agent_config<||>
   Quantum_config<||> ~> Service['quantum-metadata']
   Quantum_metadata_agent_config<||> ~> Service['quantum-metadata']
 
   quantum_metadata_agent_config {
-    'DEFAULT/debug':                          value => $debug;
-    'DEFAULT/auth_url':                       value => $auth_url;
-    'DEFAULT/auth_region':                    value => $auth_region;
-    'DEFAULT/admin_tenant_name':              value => $auth_tenant;
-    'DEFAULT/admin_user':                     value => $auth_user;
-    'DEFAULT/admin_password':                 value => $auth_password;
-    'DEFAULT/nova_metadata_ip':               value => $metadata_ip;
-    'DEFAULT/nova_metadata_port':             value => $metadata_port;
-    'DEFAULT/metadata_proxy_shared_secret':   value => $shared_secret;
+    'DEFAULT/debug':                        value => $debug;
+    'DEFAULT/auth_url':                     value => $auth_url;
+    'DEFAULT/auth_region':                  value => $auth_region;
+    'DEFAULT/admin_tenant_name':            value => $auth_tenant;
+    'DEFAULT/admin_user':                   value => $auth_user;
+    'DEFAULT/admin_password':               value => $auth_password;
+    'DEFAULT/nova_metadata_ip':             value => $metadata_ip;
+    'DEFAULT/nova_metadata_port':           value => $metadata_port;
+    'DEFAULT/metadata_proxy_shared_secret': value => $shared_secret;
   }
 
   if $::quantum::params::metadata_agent_package {

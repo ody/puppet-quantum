@@ -22,8 +22,8 @@
 class quantum::agents::linuxbridge (
   $physical_interface_mappings,
   $firewall_driver = 'quantum.agent.linux.iptables_firewall.IptablesFirewallDriver',
-  $package_ensure  = 'present',
-  $enable          = true,
+  $package_ensure  = present,
+  $enable          = true
 ) {
 
   include quantum::params

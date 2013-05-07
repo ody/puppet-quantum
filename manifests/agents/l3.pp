@@ -1,5 +1,5 @@
 class quantum::agents::l3 (
-  $package_ensure               = 'present',
+  $package_ensure               = present,
   $enabled                      = true,
   $debug                        = 'False',
   $auth_tenant                  = 'services',
@@ -13,10 +13,10 @@ class quantum::agents::l3 (
   $handle_internal_only_routers = 'True',
   $metadata_ip                  = '127.0.0.1',
   $polling_interval             = 3,
-  $root_helper      = 'sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf',
+  $root_helper                  = 'sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf'
 ) {
 
-  include 'quantum::params'
+  include quantum::params
 
   Quantum_config<||> ~> Service['quantum-l3']
   Quantum_l3_agent_config<||> ~> Service['quantum-l3']
@@ -25,18 +25,18 @@ class quantum::agents::l3 (
   # This only lists config specific to the l3 agent.  quantum.ini supplies
   # the rest.
   quantum_l3_agent_config {
-    'DEFAULT/debug':                          value => $debug;
-    'DEFAULT/admin_tenant_name':              value => $auth_tenant;
-    'DEFAULT/admin_user':                     value => $auth_user;
-    'DEFAULT/admin_password':                 value => $auth_password;
-    'DEFAULT/use_namespaces':                 value => $use_namespaces;
-    'DEFAULT/root_helper':                    value => $root_helper;
-    'DEFAULT/interface_driver':               value => $interface_driver;
-    'DEFAULT/router_id':                      value => $router_id;
-    'DEFAULT/gateway_external_network_id':    value => $gateway_external_network_id;
-    'DEFAULT/metadata_ip':                    value => $metadata_ip;
-    'DEFAULT/external_network_bridge':        value => $external_network_bridge;
-    'DEFAULT/polling_interval':               value => $polling_interval;
+    'DEFAULT/debug':                        value => $debug;
+    'DEFAULT/admin_tenant_name':            value => $auth_tenant;
+    'DEFAULT/admin_user':                   value => $auth_user;
+    'DEFAULT/admin_password':               value => $auth_password;
+    'DEFAULT/use_namespaces':               value => $use_namespaces;
+    'DEFAULT/root_helper':                  value => $root_helper;
+    'DEFAULT/interface_driver':             value => $interface_driver;
+    'DEFAULT/router_id':                    value => $router_id;
+    'DEFAULT/gateway_external_network_id':  value => $gateway_external_network_id;
+    'DEFAULT/metadata_ip':                  value => $metadata_ip;
+    'DEFAULT/external_network_bridge':      value => $external_network_bridge;
+    'DEFAULT/polling_interval':             value => $polling_interval;
   }
 
   if $::quantum::params::l3_agent_package {
