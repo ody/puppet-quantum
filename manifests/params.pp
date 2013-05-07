@@ -1,6 +1,6 @@
 class quantum::params {
 
-  if($::osfamily == 'Redhat') {
+  if ($::osfamily == 'Redhat') {
     $package_name       = 'openstack-quantum'
     $server_package     = false
     $server_service     = 'quantum-server'
@@ -26,7 +26,7 @@ class quantum::params {
 
     $kernel_headers     = "linux-headers-${::kernelrelease}"
 
-  } elsif($::osfamily == 'Debian') {
+  } elsif ($::osfamily == 'Debian') {
 
     $package_name       = 'quantum-common'
     $server_package     = 'quantum-server'
@@ -57,7 +57,6 @@ class quantum::params {
     $kernel_headers     = "linux-headers-${::kernelrelease}"
 
   } else {
-
     fail("Unsupported osfamily ${$::osfamily}")
 
   }
