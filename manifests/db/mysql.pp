@@ -10,8 +10,7 @@ class quantum::db::mysql (
 ) {
 
   Class['mysql::server'] -> Class['quantum::db::mysql']
-
-  require 'mysql::python'
+  Class['mysql::python'] -> Class['quantum::db::mysql']
 
   mysql::db { $dbname:
     user         => $user,
@@ -28,5 +27,4 @@ class quantum::db::mysql (
       database  => $dbname,
     }
   }
-
 }
